@@ -24,6 +24,7 @@
 require File.join File.expand_path('../../', __FILE__), 'helpers/path'
 require File.join File.expand_path('../../', __FILE__), 'helpers/include'
 require 'jekyll'
+require 'yaml'
 require 'pathname'
 
 module Jekyll
@@ -40,6 +41,7 @@ module Jekyll
       @ext      = File.extname(name)
       @content  = content
       @data     = { layout: "no_layout" } # hack
+      
     end
     
     def render(payload, info)
@@ -57,9 +59,9 @@ module LiquidPlus
 
     def parse_markup
       # If raw, strip from the markup as not to confuse the Path syntax parsing
-      if @markup =~ /(.+?)\sraw\s*$/
-        @markup = $1.strip
-        @raw = true
+      if @markup =~ /^(\s*raw\s)?(.+?)(\sraw\s*)?$/
+        @markup = $2.strip
+        @raw = true unless $1.nil? and $3.nil?
       end
 
       # Separate params from markup
@@ -82,13 +84,16 @@ module LiquidPlus
         Dir.chdir(File.dirname(path)) do
           content = path.read
           
-          # Strip out yaml header from partials
-          content = $1.lstrip if content =~ /\A-{3}.+[^\A]-{3}\n(.+)/m
+          #Strip out yaml header from partials
+          if content =~ /\A-{3}(.+[^\A])-{3}\n(.+)/m
+            @local_vars = YAML.safe_load($1.strip)
+            content = $2.strip
+          end
 
           if @raw
             content
           else
-            content = parse_params(content, context) if @params
+            content = parse_params(content, context) if @params or @local_vars
 
             p = Jekyll::ConvertiblePage.new(context.registers[:site], path, content)
             payload = { 'page' => context.registers[:page], 'site' => context.registers[:site] }
@@ -102,7 +107,7 @@ module LiquidPlus
 
         msg  = "From #{context.registers[:page]['path']}: "
         msg += "File '#{name}' not found"
-        msg += " at '#{dir}'" unless name == dir
+        msg += " in '#{dir}' directory" unless name == dir
 
         puts msg.red
         return msg
@@ -110,13 +115,16 @@ module LiquidPlus
     end
 
     def parse_params(content, context)
-      markup = @markup + @params
+      if @params
+        markup = @markup + @params
+      end
       partial = Liquid::Template.parse(content)
 
       context.stack do
-        params = Jekyll::Tags::IncludeTag.new('', markup, []).parse_params(context) 
-        context['render'] = params
-        content = partial.render(context)
+        c = context
+        c['render'] = Jekyll::Tags::IncludeTag.new('', markup, []).parse_params(context) if @params
+        c['page'] = c['page'].deep_merge(@local_vars) if @local_vars and @local_vars.keys.size > 0
+        content = partial.render(c)
       end
       content
     end

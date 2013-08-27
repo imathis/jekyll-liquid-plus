@@ -3,7 +3,7 @@ require File.join File.expand_path('../../', __FILE__), 'helpers/conditional'
 module LiquidPlus
   class CaptureTag < Liquid::Block
     WORD_REGEX = '[[:word:]]'
-    SYNTAX = /(#{WORD_REGEX}+)\s*(\+=)?/o
+    SYNTAX = /(#{WORD_REGEX}+)\s*(\+=|\|\|=)?/o
 
     def initialize(tag_name, markup, tokens)
       @markup = markup
@@ -17,10 +17,10 @@ module LiquidPlus
           @operator = $2
 
           output = super
-          if @operator == '+=' && !context.scopes.last[@to].nil?
-            context.scopes.last[@to] += output 
-          else
-            context.scopes.last[@to] = output
+          if @operator == '+=' and !context.scopes.last[@to].nil?
+            context.scopes.last[@to] += output.strip 
+          elsif @operator.nil? or (@operator == '||=' and context.scopes.last[@to].nil?)
+            context.scopes.last[@to] = output.strip
           end
 
         else

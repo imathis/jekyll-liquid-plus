@@ -22,7 +22,7 @@ file.html → {% include (some_bool ? file.html : file2.html) %}
 ## Cascading include
 file.html → {% include not_there.html || file.html %}
 '' → '{% include not_there.html || none %}'
-Included file 'not_there.html' not found in _includes directory → {% include nothing || not_there.html %}
+From include.html: File 'not_there.html' not found in '_includes/' directory → {% include nothing || not_there.html %}
 
 ## Complex includes
 file2.html and variable → {% include (some_bool ? not_here : file.html) || file2.html var='variable' %}

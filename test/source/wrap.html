@@ -20,7 +20,7 @@ layout: nil
 ## Cascading wrap
 [- file.html -] → {% wrap not_there.html || f/file.html %}[- {=yield} -]{% endwrap %}
 '' → '{% wrap not_there.html || none %}[- {=yield} -]{% endwrap %}'
-[- Included file 'not_there.html' not found in _includes directory -] → {% wrap_include nothing || not_there.html %}[- {=yield} -]{% endwrap_include %}
+[- From wrap.html: File 'not_there.html' not found in '_includes/' directory -] → {% wrap_include nothing || not_there.html %}[- {=yield} -]{% endwrap_include %}
 
 ## Complex wraps
 [- file2.html and variable -] → {% wrap (some_bool ? not_here : f/file.html) || f/file2.html var='variable' %}[- {=yield} -]{% endwrap %}

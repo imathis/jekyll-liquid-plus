@@ -22,7 +22,7 @@ def test(path)
   end
 end
 
-`bundle exec jekyll build`
+`bundle exec jekyll build --trace`
 
 # Test include
 

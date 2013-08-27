@@ -23,7 +23,7 @@ module LiquidPlus
 
       def evaluate_expression(markup, context)
         if markup =~ EXPRESSION
-          evaluate($2, $3, context)
+          evaluate($2, $3.gsub(/ \|\| /, ' or '), context)
         else
           true
         end

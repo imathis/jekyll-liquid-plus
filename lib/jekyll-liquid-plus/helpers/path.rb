@@ -62,7 +62,7 @@ module LiquidPlus
       # Returns a list of file paths
       #
       def get_paths(files, context)
-        files = files.split("||").map do |file|
+        files = files.split(/ (\|\||or) /).map do |file|
           file = file.strip
           context[file].nil? ? file : context[file]
         end

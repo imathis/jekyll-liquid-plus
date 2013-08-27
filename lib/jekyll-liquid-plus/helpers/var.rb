@@ -2,7 +2,7 @@ require File.join File.expand_path('../../', __FILE__), 'helpers/conditional'
 
 module LiquidPlus
   class Var
-    SYNTAX = /(#{Liquid::VariableSignature}+)\s*(=|\+=)\s*(.*)\s*/o
+    SYNTAX = /(#{Liquid::VariableSignature}+)\s*(=|\+=|\|\|=)\s*(.*)\s*/o
 
     class << self
       def parse(markup, context)
@@ -14,9 +14,9 @@ module LiquidPlus
 
             value = get_value(@from, context)
 
-            if @operator == '+=' && !context.scopes.last[@to].nil?
-              context.scopes.last[@to] += value 
-            else
+            if @operator == '+=' and !context.scopes.last[@to].nil?
+              context.scopes.last[@to] += value
+            elsif @operator == '=' or (@operator == '||=' and context.scopes.last[@to].nil?)
               context.scopes.last[@to] = value
             end
             context
