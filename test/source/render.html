@@ -1,0 +1,31 @@
+---
+layout: nil
+---
+{% assign file = 'f/file.html' %}
+{% assign some_bool = true %}
+{% assign test_var = 'variable' %}
+
+## Simple include
+file.html → {% render f/file.html %}
+
+## File name stored in variable name
+file.html → {% render file %}
+
+## Post conditional include
+'' → '{% render f/file.html unless true %}'
+file.html → {% render f/file.html if some_bool %}
+
+## Ternary include
+file2.html → {% render (false ? f/file.html : f/file2.html) %}
+file.html → {% render (some_bool ? f/file.html : f/file2.html) %}
+
+## Cascading include
+file.html → {% render not_there.html || f/file.html %}
+'' → '{% render not_there.html || none %}'
+From render.html: File 'not_there.html' not found → {% render nothing || not_there.html %}
+
+## Complex includes
+file2.html and variable → {% render (some_bool ? not_here : f/file.html) || f/file2.html var='variable' %}
+'' → '{% render (some_bool ? not_here : f/file.html) || f/file2.html var='variable' unless true %}'
+file2.html and variable → {% render (some_bool ? not_here : f/file.html) || f/file2.html var='variable' if some_bool %}
+

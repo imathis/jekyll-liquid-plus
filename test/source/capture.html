@@ -1,0 +1,21 @@
+---
+layout: nil
+---
+{% assign some_bool = false %}
+## Simple capture
+hi → {% capture var1 %}hi{% endcapture %}{{ var1 }}
+
+## Conditional capture
+'' → '{% capture var2 unless true %}hi{% endcapture %}{{ var2 }}'
+hi → {% capture var3 if true %}hi{% endcapture %}{{ var3 }}
+'' → '{% capture var4 if some_bool %}hi{% endcapture %}{{ var4 }}'
+
+## Additive capture
+hihi → {% capture var3 += if true %}hi{% endcapture %}{{ var3 }}
+
+## Ternary capture
+hi → {% capture (var3 != 'hihi' ? var3 : var5) %}hi{% endcapture %}{{ var5}}
+
+## Complex capture
+hi → {% capture (2 + 2 == 4 ? var6 : var7) if var3 == 'hihi' %}hi{% endcapture %}{{ var6}}
+

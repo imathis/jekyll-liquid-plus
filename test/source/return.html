@@ -1,0 +1,19 @@
+---
+layout: nil
+---
+{% assign foo = bar %}
+
+## Simple return
+bar → {% return foo %}
+
+## Conditional return
+bar → {% return foo if foo %}
+'' → '{% return foo unless foo == 'bar' %}'
+
+## Ternary return
+nope → {% return (foo == 'baz' ? foo : nope) %}
+
+## Cascading return
+nope → {% return bingo || fez || nope %}
+bar → {% return bingo || fez || foo %}
+

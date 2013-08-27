@@ -1,0 +1,22 @@
+---
+layout: nil
+---
+## Simple assign
+yep → {% assign var1 = yep %}{{ var1 }}
+yep → {% assign var2 = 'yep' %}{{ var2 }}
+
+## Conditional assign
+'' → '{% assign var3 = yep unless true %}{{ var3 }}'
+nope → {% assign var4 = 'nope' if true %}{{ var4 }}
+
+## Ternary assign
+nope → {% assign var5 = (false ? 'yep' : var4) %}{{ var5 }}
+
+## Cascading assign
+nope → {% assign var6 = baz || var4 %}{{ var6 }}
+foo → {% assign var7 = baz || foo %}{{ var7 }}
+'' → '{% assign var8 = baz || foo || nil %}{{ var8 }}'
+
+## Additive assign
+yepyep → {% assign var1 += yep %}{{ var1 }}
+

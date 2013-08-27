@@ -1,0 +1,29 @@
+---
+layout: nil
+---
+{% assign some_bool = true %}
+
+## Testing a simple wrap
+[- file2.html -] → {% wrap_include file2.html %}[- {=yield} -]{% endwrap_include %}
+
+## Local var passing
+[- file2.html and working? -] → {% wrap_include file2.html var='working?' %}[- {=yield} -]{% endwrap_include %}
+
+## Conditional wrap
+'' → '{% wrap_include file2.html unless true %}[- {=yield} -]{% endwrap_include %}'
+[- file2.html -] → {% wrap_include file2.html if true %}[- {=yield} -]{% endwrap_include %}
+
+## Ternary wrap
+[- file2.html -] → {% wrap (false ? f/file.html : f/file2.html) %}[- {=yield} -]{% endwrap %}
+[- file.html -] → {% wrap (some_bool ? f/file.html : f/file2.html) %}[- {=yield} -]{% endwrap %}
+
+## Cascading wrap
+[- file.html -] → {% wrap not_there.html || f/file.html %}[- {=yield} -]{% endwrap %}
+'' → '{% wrap not_there.html || none %}[- {=yield} -]{% endwrap %}'
+[- Included file 'not_there.html' not found in _includes directory -] → {% wrap_include nothing || not_there.html %}[- {=yield} -]{% endwrap_include %}
+
+## Complex wraps
+[- file2.html and variable -] → {% wrap (some_bool ? not_here : f/file.html) || f/file2.html var='variable' %}[- {=yield} -]{% endwrap %}
+'' → '{% wrap (some_bool ? not_here : f/file.html) || f/file2.html var='variable' unless true %}[- {=yield} -]{% endwrap %}'
+[- file2.html and variable -] → {% wrap (some_bool ? not_here : f/file.html) || f/file2.html var='variable' if some_bool %}[- {=yield} -]{% endwrap %}
+
