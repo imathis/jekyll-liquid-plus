@@ -1,25 +1,6 @@
 # Jekyll Liquid Plus
 
-Super powered Liquid tags for smarter Jekyll templating.
-
-### Improved tags
-
-These tags work just like Jekyll's tags (backwards compatible) but add new features like post conditions, cascading assignment, ternary operations and more.
-
-- `include` - Accepts multiple paths (including the first which is found), handles conditions, can fail gracefully.
-- `capture` - Handles `+=` and `||=`, captures conditionally, strips unwanted whitespace.
-- `assign` - Values can be strings or variables, handles `+=` and `||=`, assign first truthy result with `var || var`, handles conditions.
-
-### New tags
-
-These are new tags which help make Jekyll template writing DRY and more concise.
-
-- `render` - Just like the new include, but allows you to embed from anywhere on your file system (paths are relative to Jekyll's source directory).
-- `wrap` - Just like render, but allows you to wrap the output with HTML or whatever.
-- `wrap_include` - Just like wrap, but wraps `include` output instead of `reader`.
-- `return` - Output a variable based on logical expressions (a simpler, more concise `if` block).
-
-Reade about all these tags and see examples below.
+Super powered Liquid tags for smarter Jekyll templating. [See examples below](#usage).
 
 ## Installation
 
@@ -83,7 +64,9 @@ With jekyll-liquid-plus, you can use familiar features like post conditions and 
 
 ### Include
 
-The standard `include` can embed a file from Jekyll's `_includes` directory, and optionally create local variables.
+The new include tag accepts multiple paths as strings or variables and searches the file system, including the first file found. It allows you to write ternary expressions and post conditions to control what file to include and whether to include a file at all. It can even fail gracefully. Have a look.
+
+First, here's the standard `include` in action. It can embed a file from Jekyll's `_includes` directory, and optionally create local variables.
 
 ```
 {% include article.html %}
@@ -189,6 +172,14 @@ Wrap is just like wrap_include except it uses the render tag instead of the incl
 
 As above, all the cool stuff you can do with render applies here.
 
+### Assign
+
+Examples coming soon...
+
+### Capture
+
+Examples coming soon...
+
 ### Return
 
 Return is useful when you want to conditionally output a variable without having to write an `{% if %}` block. Yes it's utlitiy is pretty limited, but in Liquid, anything that helps you use fewer conditional blocks, makes code easier to read. Here are some examples.
@@ -208,6 +199,7 @@ It's not amazing, but it's better than this.
 ```
 
 Gross huh?
+
 
 ## Contributing
 
