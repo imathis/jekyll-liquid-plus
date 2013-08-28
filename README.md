@@ -1,5 +1,7 @@
 # Jekyll Liquid Plus
 
+[![Gem Version](https://badge.fury.io/rb/jekyll-liquid-plus.png)](http://badge.fury.io/rb/jekyll-liquid-plus)
+
 Super powered Liquid tags for smarter Jekyll templating.
 
 Redesigned, but backwards compatible: include, assign, capture.
