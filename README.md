@@ -118,7 +118,7 @@ From theme/article.html: File 'not_there.html' not found in '_includes/' directo
 
 ## Render Tag
 
-Everything you can do with `include`, you can also do with `render`, However there are a few differences. If you haven't read about include, [do it](#include).
+Everything you can do with `include`, you can also do with `render`, However there are a few differences. If you haven't read about include, [do it](#include-tag).
 
 #### Render syntax
 
