@@ -5,11 +5,21 @@ require 'colorator'
 def test(path)
   path = Pathname.new path + '.html'
   failure = []
+  start = 0
+
+  f = File.new("source/#{path}")
+  # Get the starting line (after the YAML FM) for source map
+  f.each do |line|
+    if line =~ /---/ and f.lineno > 1
+      break start = f.lineno + 1 
+    end
+  end
+
   Dir.chdir('_site') do
     File.readlines(path).each_with_index do |line, i|
       if line =~ /(.+?)→(.+)/
         if $1.strip != $2.strip
-          failure << " - line #{i+4}: #{$1}!=#{$2}"
+          failure << " - line #{i+start}: #{$1}!=#{$2}"
         end
       end
     end
@@ -29,7 +39,6 @@ end
 test 'include'
 test 'render'
 test 'wrap'
-test 'exists'
 test 'assign'
 test 'capture'
 test 'return'

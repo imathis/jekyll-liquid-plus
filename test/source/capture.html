@@ -21,7 +21,7 @@ hi → {% capture (var3 != 'hihi' ? var3 : var5) %}hi{% endcapture %}{{ var5}}
 ## Complex capture
 hi → {% capture (2 + 2 == 4 ? var6 : var7) if var3 == 'hihi' %}hi{% endcapture %}{{ var6}}
 hi → {% capture var8 if false or page.layout %}hi{% endcapture %}{{ var8 }}
-um, hi → {% capture var9 if false || page.layout %}
+um, hi → {% capture var9 if false or page.layout %}
         {% assign var10 = 'hi' %}
         um, {{ var10 }}
         {% endcapture %}{{ var9 }}

@@ -2,6 +2,9 @@
 
 Super powered Liquid tags for smarter Jekyll templating. [See examples below](#usage).
 
+Redesigned, but backwards compatible: include, assign, capture.
+All new: render, wrap, wrap_include, return.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -22,44 +25,6 @@ Next create a plugin in your Jekyll plugins directory called something like "liq
 require 'jekyll-liquid-plus'
 ```
 
-## What's wrong with Liquid?
-
-With standard Liquid tags, being DRY is a lot of work. If you want to create a reusable partial for something as simple as displaying a semantic date for a page or post, you
-have to do something like this:
-
-1. Determine if the current page even has a date (pages don't by default).
-2. Did we find a date? Capture stores strings, so we compare `has_date` to `'0'` (ugh!).
-3. Store the date wrapped in a semantic `<time>` tag.
-4. Finally, output the date date in the template.
-
-```
-{% capture date %}{{ post.date }}{{ page.date }}{% endcapture %}
-{% capture has_date %}{{ date | size }}{% endcapture %}
-
-{% if has_date != '0' %}
-  {% capture date %}
-    <time datetime="{{ date | datetime | date_to_xmlschema }}" pubdate>{{ date | format_date, site.date_format }}</time>
-  {% endcapture %}
-{% endif %}
-
-{% unless date == '' %}
-  <p class='post-meta'>Published: {{ date }}</p>
-{% endunless %}
-```
-
-With jekyll-liquid-plus, you can use familiar features like post conditions and `||` assignment to write templating code which is much more straight forward.
-
-```
-{% capture date if post.date or page.date %}
-  {% assign date = post.date or page.date %}
-  <time datetime="{{ date | datetime | date_to_xmlschema }}" pubdate>{{ date | format_date, site.date_format }}</time>
-{% endcapture %}
-
-{% if date %}
-  <p class='post-meta'>Published: {{ date }}</p>
-{% endif %}
-```
-
 ## Usage
 
 ### Include
@@ -73,28 +38,58 @@ First, here's the standard `include` in action. It can embed a file from Jekyll'
 {% include article.html type='linkpost' %} # in article.html {{ include.type }} outputs 'linkpost'
 ```
 
-Now include can cascade file paths, embedding the first one which exists. This makes it possible for theme and plugin creators to easily allow overrides for template components. 
+#### Include syntax
+
+The new syntax may seem a bit crazy out of contex of use, but the examples below are nice.
+
+```
+           Cascade and/or ternary exp    post condition      local vars
+{% include [file1.md || file2.md || var] [unless 2 + 2 == 6] [var=value] %}
+```
+
+#### Cascading paths
+
+Now include can cascade file paths, embedding the first file which exists.
 
 ```
 {% include custom/article.html || theme/article.html %}
 ```
 
-By passing `none` you can tell include to fail gracefully, rather than outputting an error if no file path exists. Here is how a theme creator might make it easy to inject a script for comments at the bottom of a post.
+Cascading makes it possible for theme and plugin creators to easily allow users to override template components, customizing a template without editing the original source.
+
+Passing `none` will tell include to fail gracefully, rather than outputting an error if no file path exists.
 
 ```
 {% include custom/comments.html || none %}
 ```
 
+This shows how a theme creator might make it easy to inject a script for comments at the bottom of a post.
+
+## Ternary paths
+
+Sometimes this is just simpler.
+
+```
+{% include (post ? theme/post.html : theme/page.html) %}
+{% include (post ? theme/post.html : theme/page.html) || none %}
+```
+
+The second example will fail gracefully and shows how you might use a ternary expression and cascading paths together.
+
+#### Conditional includes
 
 Conditional includes make it easy to pick the right partial without a nest of `{% if %}` blocks.
 
 ```
 {% include theme/post/date.html if post.date or page.date %}
 {% include custom/comments.html unless post.comments == false %}
-{% include (post ? theme/post.html : theme/page.html) %}
 ```
 
-Include even allows variables to be passed instead of string paths. In this example, a user could set a default sidebar path in their Jekyll config file like this:
+#### Include accepts variables
+
+Include even allows variables to be passed instead of string paths.
+
+For this example, we'll assuse a user has set a default sidebar path in their Jekyll config file like this:
 
 ```yaml
 sidebar:
@@ -107,13 +102,15 @@ Then on a per page basis they could override their default sidebar in the page's
 sidebar: page_sidebar.html
 ```
 
-Now we can include the correct sidebar by cascading them. Using a post condition, we can even allow users to disable the sidebar.
+Now we can include the correct sidebar by cascading them. Using a post condition, we can even allow users to disable the sidebar by setting `sidebar: false` in their YAML front matter.
 
 ```
-{% include page.sidebar || site.sidebar.default || none unless page.sidebar == false %}
+{% include page.sidebar || site.sidebar.default || none  unless page.sidebar == false %}
 ```
 
-Of course you can combine cascades, ternary, post conditions and local variable passing, but you probably shouldn't.
+Of course you can combine cascades, ternary expressions, post conditions and local variable passing, but you probably shouldn't.
+
+#### Error reporting
 
 Finally, the new `include` has better error reporting. When attempting to include a file which doesn't exist, an error message will be written to the file and output to the terminal. Here's an example.
 
@@ -123,22 +120,33 @@ From theme/article.html: File 'not_there.html' not found in '_includes/' directo
 
 ### Render
 
-Everything you can do with `include`, you can also do with `render`, However there are a few differences.
+Everything you can do with `include`, you can also do with `render`, However there are a few differences. If you haven't read about include, [do it](#include).
+
+#### Render syntax
+
+```
+                Cascade and/or ternary exp    post condition      local vars
+{% render [raw] [file1.md || file2.md || var] [unless 2 + 2 == 6] [var=value] %}
+```
+
+#### Differences from include
 
 1. Paths are relative to Jekyll's source directory, not the `_includes` directory.
 2. Embed adjacent files by adding `./` to the beginning of a path.
 3. When passing local template variables, they are accessed as `{{ render.var }}` instead of `{{ include.var }}`
 5. YAML front-matter is stripped from partials, but local page variables are rendered.
 
-This is the standard `include` example from above, but using render it searches for files starting at Jekyll's source directory (./ by default). Note I'm using underscores in the file names to tell Jekyll to ignore them as partials, however you can embed any other file,
-including full Jekyll posts and pages.
+This is the standard include example from above, but when using render it searches for files starting at Jekyll's source directory (./ by default). 
 
 ```
 {% render _article.html %} # embeds _article.html from the source directory
 {% render _article.html type='linkpost' %} # in _article.html {{ render.type }} outputs 'linkpost'
 ```
+Note I'm using underscores in the file names to tell Jekyll to ignore them as partials, however you can embed any other file, including full Jekyll posts and pages.
 
 This great for when you are writing a bunch of pages and would like to break things up into partials without have to keep everything in the _includes directory.
+
+#### Rendering raw unprocessed files
 
 To embed a file without parsing it through Liquid and (if appropriate, markdown or textile) add `raw` to the beginning of your render tag. 
 
@@ -148,13 +156,28 @@ To embed a file without parsing it through Liquid and (if appropriate, markdown 
 
 ### Wrap Include
 
-Wrap Include is like include, but it allows you to wrap the contents of an included file in a block. Here's an example.
+This tag is also like include, but it allows you to wrap the contents of an included file in a block.
 
+#### Wrap include syntax
+
+Use the `{= yield }` tag to indicate where the partial's content will be rendered.
+
+```
+                Cascade and/or ternary exp    post condition      local vars
+{% wrap_include [file1.md || file2.md || var] [unless 2 + 2 == 6] [var=value] %}
+  <div>{= yield }</div>
+{% endwrap_include %}
+```
+
+Here's an example.
+
+```
 {% wrap_include date.html %}
 <p class='post-date'>{= yield }</p>
 {% endwrap_include %}
+```
 
-Using the `{= yield }` tag, you can chose where to put the rendered content. Here's another useful example.
+Here's another useful example.
 
 {% wrap_include custom/comments.html || theme/comments.html unless page.comments == false %}
 <div id='comments'>{= yield }</div>
@@ -166,40 +189,128 @@ As above, all the cool stuff you can do with include applies here.
 
 Wrap is just like wrap_include except it uses the render tag instead of the include tag. This means paths start at Jekyll's source directory and you can do everything listed under render.
 
+#### Wrap syntax
+
+Use the `{= yield }` tag to indicate where the partial's content will be rendered.
+
+```
+              Cascade and/or ternary exp    post condition      local vars
+{% wrap [raw] [file1.md || file2.md || var] [unless 2 + 2 == 6] [var=value] %}
+  <div>{= yield }</div>
+{% endwrap_include %}
+```
+
+Here's an example.
+
+```
 {% wrap _nav.html %}
 <nav role='navigation'>{= yield }</nav>
 {% endwrap %}
+```
 
 As above, all the cool stuff you can do with render applies here.
 
 ### Assign
 
-Examples coming soon...
+The new assign tag can accept the `+=` and `||=` operators and allows cascading variable assignment and post conditions.
+
+### Assign syntax
+
+```
+                cascade or ternary  filters    post condition 
+{% assign var = [some_var or 'bar'] [| upcase] [unless 2 + 2 == 6] %}
+```
+
+Operators work as you'd expect.
+
+```
+{% assign var = 'hi' %}      # {{ var }} yields 'hi'
+{% assign var ||= 'yo' %}    # {{ var }} yields 'hi'
+{% assign var += ', man.' %} # {{ var }} yields 'hi, man.'
+```
+
+You can do cascading assignment like this.
+
+```
+{% assign date = post.date or page.date or nil %}
+```
+
+And ternary assignment too.
+
+```
+{% assign url = (post ? post.url : page.url) %}
+```
+
+Post conditions work like this.
+
+```
+{% assign date = post.date or page.date or nil %}
+{% assign date = date | datetime | date_to_xmlschema if date != nil %}
+```
 
 ### Capture
 
-Examples coming soon...
+The new capture tag allows `+=`, `||=` assignment and evaluates post conditions.
+
+#### Capture syntax
+
+```
+                    post condition 
+{% capture var [+=] [unless 2 + 2 == 6] %}
+[value]
+{% endcapture %}
+```
+
+It's pretty straightforward, but here are some examples.
+
+```
+{% assign var = 'hi' %}
+{% capture var ||= %} yo {% endcapture %}  # {{ var }} yields 'hi'
+{% capture var += %}, man.{% endcapture %} # {{ var }} yields 'hi, man.'
+```
+
+Here's an example of how you might generate a semantic `<time>` tag.
+
+```
+{% assign date = page.date or post.date or nil %}
+
+{% capture date if date %}
+<time datetime="{{ date | datetime | date_to_xmlschema }}" pubdate>{{ date | format_date }}</time>
+{% endcapture %}
+```
 
 ### Return
 
-Return is useful when you want to conditionally output a variable without having to write an `{% if %}` block. Yes it's utlitiy is pretty limited, but in Liquid, anything that helps you use fewer conditional blocks, makes code easier to read. Here are some examples.
+Return is useful when you want to conditionally output a variable without having to write an `{% if %}` block. Yes its utility is pretty limited, but in Liquid, anything that helps you use fewer conditional blocks, makes code easier to read. 
+
+#### Return syntax
 
 ```
-{% return (post ? post.content : page.content) %}
-<a href="{% return post.external-url || post.url %}">{{ post.title }}</a>
-<div class="post {% return 'linklog' if post.external-url %}">...
+          Cascade and/or ternary exp    filters    post condition 
+{% return [file1.md || file2.md || var] [| upcase] [unless 2 + 2 == 6] %}
 ```
 
-It's not amazing, but it's better than this.
+Below each example shows how return can be used, followed by something that works the same, but with only standard liquid tags.
 
 ```
-{% if post %}{{ post.content }}{% else %}{{ page.content }}{% endif %}
-<a href="{% if post.external-url %}{{ post.external-url }}{% else %}{{ post.url }}{% endif %}">{{ post.title }}</a>
-<div class="post {% if post.external-url %} linklog {% endif %}">
+new: {% return (post ? post.content : page.content) %}
+old: {% if post %}{{ post.content }}{% else %}{{ page.content }}{% endif %}
+```
+```
+new: <a href="{% return post.external-url || post.url %}">{{ post.title }}</a>
+old: <a href="{% if post.external-url %}{{ post.external-url }}{% else %}{{ post.url }}{% endif %}">{{ post.title }}</a>
+```
+```
+new: <div class="post {% return 'linklog' if post.external-url %}">...
+old: <div class="post {% if post.external-url %} linklog {% endif %}">
+```
+```
+new: {% return post.date or page.date | datetime | date_to_xmlschema if post.date or page.date %}
+old: {% capture date %}{{ post.date }}{{ page.date }}{% endcapture %}
+     {% if date != '' %}{{ date | datetime | date_to_xmlschema }}{% endif %}
 ```
 
-Gross huh?
-
+It's not amazing, but it may come in handy.
 
 ## Contributing
 
@@ -208,7 +319,6 @@ Gross huh?
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
 
 ## License
 
