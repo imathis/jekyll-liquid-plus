@@ -1,6 +1,6 @@
 # Jekyll Liquid Plus
 
-Super powered Liquid tags for smarter Jekyll templating. [See examples below](#usage).
+Super powered Liquid tags for smarter Jekyll templating.
 
 Redesigned, but backwards compatible: include, assign, capture.
 All new: render, wrap, wrap_include, return.
@@ -25,9 +25,7 @@ Next create a plugin in your Jekyll plugins directory called something like "liq
 require 'jekyll-liquid-plus'
 ```
 
-## Usage
-
-### Include
+## Include Tag
 
 The new include tag accepts multiple paths as strings or variables and searches the file system, including the first file found. It allows you to write ternary expressions and post conditions to control what file to include and whether to include a file at all. It can even fail gracefully. Have a look.
 
@@ -40,7 +38,7 @@ First, here's the standard `include` in action. It can embed a file from Jekyll'
 
 #### Include syntax
 
-The new syntax may seem a bit crazy out of contex of use, but the examples below are nice.
+The new syntax may seem a bit crazy out of context of use, but the examples below are nice.
 
 ```
            Cascade and/or ternary exp    post condition      local vars
@@ -65,7 +63,7 @@ Passing `none` will tell include to fail gracefully, rather than outputting an e
 
 This shows how a theme creator might make it easy to inject a script for comments at the bottom of a post.
 
-## Ternary paths
+#### Ternary paths
 
 Sometimes this is just simpler.
 
@@ -118,7 +116,7 @@ Finally, the new `include` has better error reporting. When attempting to includ
 From theme/article.html: File 'not_there.html' not found in '_includes/' directory
 ```
 
-### Render
+## Render Tag
 
 Everything you can do with `include`, you can also do with `render`, However there are a few differences. If you haven't read about include, [do it](#include).
 
@@ -154,7 +152,7 @@ To embed a file without parsing it through Liquid and (if appropriate, markdown 
 {% render raw _test.md %} # outputs bare markdown and unprocessed liquid tags
 ```
 
-### Wrap Include
+## Wrap Include Tag
 
 This tag is also like include, but it allows you to wrap the contents of an included file in a block.
 
@@ -185,7 +183,7 @@ Here's another useful example.
 
 As above, all the cool stuff you can do with include applies here.
 
-### Wrap
+## Wrap Tag
 
 Wrap is just like wrap_include except it uses the render tag instead of the include tag. This means paths start at Jekyll's source directory and you can do everything listed under render.
 
@@ -210,11 +208,11 @@ Here's an example.
 
 As above, all the cool stuff you can do with render applies here.
 
-### Assign
+## Assign Tag
 
 The new assign tag can accept the `+=` and `||=` operators and allows cascading variable assignment and post conditions.
 
-### Assign syntax
+#### Assign syntax
 
 ```
                 cascade or ternary  filters    post condition 
@@ -248,7 +246,7 @@ Post conditions work like this.
 {% assign date = date | datetime | date_to_xmlschema if date != nil %}
 ```
 
-### Capture
+## Capture Tag
 
 The new capture tag allows `+=`, `||=` assignment and evaluates post conditions.
 
@@ -279,7 +277,7 @@ Here's an example of how you might generate a semantic `<time>` tag.
 {% endcapture %}
 ```
 
-### Return
+## Return Tag
 
 Return is useful when you want to conditionally output a variable without having to write an `{% if %}` block. Yes its utility is pretty limited, but in Liquid, anything that helps you use fewer conditional blocks, makes code easier to read. 
 
