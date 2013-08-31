@@ -1,6 +1,6 @@
 # Jekyll Liquid Plus
 
-[![Gem Version](https://badge.fury.io/rb/jekyll-liquid-plus.png)](http://badge.fury.io/rb/jekyll-liquid-plus)
+[![Gem Version](https://badge.fury.io/rb/jekyll-liquid-plus.png)](http://badge.fury.io/rb/jekyll-liquid-plus) [![Build Status](https://travis-ci.org/imathis/jekyll-liquid-plus.png)](https://travis-ci.org/imathis/jekyll-liquid-plus)
 
 Super powered Liquid tags for smarter Jekyll templating.
 
