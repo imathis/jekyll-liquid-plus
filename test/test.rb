@@ -2,6 +2,8 @@
 require 'pathname'
 require 'colorator'
 
+has_failed = false
+
 def test(path)
   path = Pathname.new path + '.html'
   failure = []
@@ -27,6 +29,7 @@ def test(path)
   if failure.size > 0
     puts "failed".red + ": #{path}"
     puts failure.join "\n"
+    has_failed = true
   else
     puts "passed".green + ": #{path}" 
   end
@@ -42,3 +45,5 @@ test 'wrap'
 test 'assign'
 test 'capture'
 test 'return'
+
+abort if has_failed

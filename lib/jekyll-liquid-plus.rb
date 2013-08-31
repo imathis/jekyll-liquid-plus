@@ -1,4 +1,6 @@
-require "liquid"
+require 'liquid'
+
+$:.unshift File.dirname(__FILE__)
 
 module LiquidPlus
   autoload :IncludeTag,    'jekyll-liquid-plus/tags/include'
