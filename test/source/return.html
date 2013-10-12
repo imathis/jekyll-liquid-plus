@@ -2,8 +2,8 @@
 layout: nil
 date: 2013-07-21 18:59
 people:
-  - { name: true }
-  - { name: false }
+  - { name: Bob }
+  - { name: Bill }
 ---
 {% assign foo = 'bar' %}
 
@@ -23,8 +23,7 @@ bar → {% return bingo || fez || foo %}
 
 ## Test local variables
 {% for person in page.people %}
-{{ person.name }}
-yep → {% return 'yep' if person.name == true %}
+yep → {% return 'yep' if person.name == 'Bill' %}
 {% endfor %}
 
 ## Returns with filters
