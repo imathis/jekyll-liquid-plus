@@ -1,6 +1,9 @@
 ---
 layout: nil
 date: 2013-07-21 18:59
+people:
+  - { name: true }
+  - { name: false }
 ---
 {% assign foo = 'bar' %}
 
@@ -17,6 +20,12 @@ nope → {% return (foo == 'baz' ? foo : 'nope') %}
 ## Cascading return
 nope → {% return bingo || fez || 'nope' %}
 bar → {% return bingo || fez || foo %}
+
+## Test local variables
+{% for person in page.people %}
+{{ person.name }}
+yep → {% return 'yep' if person.name == true %}
+{% endfor %}
 
 ## Returns with filters
 2013-07-21T18:59:00-05:00 → {% return post.date or page.date | datetime | date_to_xmlschema %}
