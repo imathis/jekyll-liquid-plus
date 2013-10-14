@@ -15,6 +15,10 @@ file.html → {% render file %}
 '' → '{% render f/file.html unless true %}'
 file.html → {% render f/file.html if some_bool %}
 
+## Test variables
+foo → {% render f/file4.html %}
+foo → {% render f/file5.html %}
+
 ## Ternary include
 file2.html → {% render (false ? f/file.html : f/file2.html) %}
 file.html → {% render (some_bool ? f/file.html : f/file2.html) %}
