@@ -1,5 +1,7 @@
 require "liquid"
 
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+
 module LiquidPlus
   autoload :IncludeTag,    'jekyll-liquid-plus/tags/include'
   autoload :WrapTag,       'jekyll-liquid-plus/tags/wrap'
