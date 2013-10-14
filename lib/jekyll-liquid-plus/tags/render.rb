@@ -96,7 +96,7 @@ module LiquidPlus
             content = parse_params(content, context) if @params or @local_vars
 
             page = Jekyll::ConvertiblePage.new(context.registers[:site], path, content)
-            payload = { 'page' => context.registers[:page], 'site' => context.registers[:site].site_payload }
+            payload = { 'page' => context.registers[:page] }.merge(context.registers[:site].site_payload)
             page.render(payload, { registers: context.registers })
             page.output.strip
           end
