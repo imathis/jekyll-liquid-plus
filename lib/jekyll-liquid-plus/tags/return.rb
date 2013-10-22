@@ -9,8 +9,8 @@ module LiquidPlus
     end
 
     def render(context)
-      if @markup = Conditional.parse(@markup, context)
-        Var.get_value(@markup, context)
+      if parsed_markup = Conditional.parse(@markup, context)
+        Var.get_value(parsed_markup, context)
       else
         ''
       end
