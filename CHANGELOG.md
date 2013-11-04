@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2 (2013-11-03)
+- Speed improvement: Now caching file path existence to reduce disk checks.
+
 ## 1.0.1 (2013-10-22)
 - Fixed var access issues #2, #3
 

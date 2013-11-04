@@ -79,7 +79,7 @@ module LiquidPlus
     def render(context)
       parse_markup
       path = get_path(context)
-      if path and File.exist? path
+      if path and Cache.exists(path)
 
         Dir.chdir(File.dirname(path)) do
           content = path.read

@@ -35,7 +35,7 @@ def test(path)
   end
 end
 
-`bundle exec jekyll build --trace`
+`rm -rf _site/; bundle exec jekyll build --trace`
 
 # Test include
 

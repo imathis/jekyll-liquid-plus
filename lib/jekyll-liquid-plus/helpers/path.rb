@@ -44,13 +44,18 @@ module LiquidPlus
         files = get_paths(files, context)
         files.each_with_index do |f, i|
           file = path ? File.join(path, f) : f
-          if File.exist? expand(file, context)
+          if exists(file, context)
             return f
           # If "file.html || none" is passed, fail gracefully
           elsif i == files.size - 1
             return f.downcase == 'none' ? false : f
           end
         end
+      end
+
+      def exists(file, context)
+        path = expand(file, context)
+        Cache.exists(path)
       end
 
       # Read file paths from context variables if necessary
