@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files`.split($/)
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "jekyll", "~> 1.1.2"
+  spec.add_runtime_dependency "jekyll", "~> 1.3.0"
   spec.add_runtime_dependency "liquid", "~> 2.5.1"
 
   spec.add_development_dependency "bundler", "~> 1.3"
