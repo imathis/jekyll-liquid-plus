@@ -12,11 +12,11 @@ module LiquidPlus
         file = Path.parse(markup, context, '_includes')
 
         if file
-          if File.exist? Path.expand(File.join('_includes', file), context)
+          if Cache.exists Path.expand(File.join('_includes', file), context)
             markup = file
             markup += params if params
             tag = Jekyll::Tags::IncludeTag.new('', markup, [])
-            tag.render(context)
+            result = tag.render(context)
           else
             dir = '_includes'
             dir = File.join dir, File.dirname(file) unless File.dirname(file) == '.'

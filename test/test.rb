@@ -35,6 +35,29 @@ def test(path)
   end
 end
 
+def test_layout(path)
+  path = Pathname.new path + '.html'
+  failure = []
+  start = 0
+
+  f = File.new("source/#{path}")
+  # Get the starting line (after the YAML FM) for source map
+  f.each do |line|
+    if line =~ /---/ and f.lineno > 1
+      break start = f.lineno + 1 
+    end
+  end
+  Dir.chdir('_site') do
+    if path.read !~ /success/
+      puts "failed".red + ": #{path}"
+      has_failed = true
+    else
+      puts "passed".green + ": #{path}" 
+    end
+  end
+end
+
+
 `rm -rf _site/; bundle exec jekyll build --trace`
 
 # Test include
@@ -45,5 +68,8 @@ test 'wrap'
 test 'assign'
 test 'capture'
 test 'return'
+test_layout 'include_layout'
+test_layout 'render_layout'
+
 
 abort if has_failed
