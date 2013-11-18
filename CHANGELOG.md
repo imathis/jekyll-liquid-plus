@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0 (2013-11-03)
+- New: Render tag works with absolute paths and user relative paths.
+
 ## 1.0.2 (2013-11-03)
 - Speed improvement: Now caching file path existence to reduce disk checks.
 

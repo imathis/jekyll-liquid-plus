@@ -12,7 +12,8 @@ module LiquidPlus
         end
       end
 
-      # Allow paths to begin from the directory of the context page
+      # Allow paths to begin from the directory of the context page or
+      # have absolute paths
       #
       # Input: 
       #  - file: "file.html"
@@ -25,6 +26,8 @@ module LiquidPlus
         if file =~ /^\.\/(.+)/
           local_dir = File.dirname context.registers[:page]['path']
           File.join root, local_dir, $1
+        elsif file =~ /^[\/~]/
+          Pathname.new(file).expand_path
         else
           File.join root, file
         end

@@ -121,10 +121,9 @@ module LiquidPlus
       partial = Liquid::Template.parse(content)
 
       context.stack do
-        c = context
-        c['render'] = Jekyll::Tags::IncludeTag.new('', markup, []).parse_params(context) if @params
-        c['page'] = c['page'].deep_merge(@local_vars) if @local_vars and @local_vars.keys.size > 0
-        content = partial.render(c)
+        context['render'] = Jekyll::Tags::IncludeTag.new('', markup, []).parse_params(context) if @params
+        context['page'] = context['page'].deep_merge(@local_vars) if @local_vars and @local_vars.keys.size > 0
+        content = partial.render(context)
       end
       content
     end
