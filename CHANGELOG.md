@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.0 (2013-11-03)
+- Fix: Render tag now properly renders {{ content }}.
+
 ## 1.1.0 (2013-11-03)
 - New: Render tag works with absolute paths and user relative paths.
 
