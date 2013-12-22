@@ -1,4 +1,5 @@
 require File.join File.expand_path('../../', __FILE__), 'helpers/path'
+require File.join File.expand_path('../../', __FILE__), 'helpers/cache'
 
 module Jekyll
 
@@ -44,42 +45,49 @@ module LiquidPlus
     
     def render(context)
       validate_params if @params
-      if @tag == 'include'
-        if @file = get_path(context, INCLUDES_DIR)
-          @markup = @file
-          @markup += @params if @params
-          @page = context.registers[:page]['path']
-          content = default_render(context)
-          parse_convertible(content, context)
-        end
-      elsif @tag =~ /render/
-        if @file = get_path(context)
-          @markup = @file
-          @markup += @params if @params
-          content = read_raw
-
-          unless @raw
-            partial = Liquid::Template.parse(content)
-
-            content = context.stack do
-              context['render'] = Jekyll::Tags::IncludeTag.new('include', @markup, []).parse_params(context) if @params
-              context['page'] = context['page'].deep_merge(@local_vars) if @local_vars and @local_vars.keys.size > 0
-              partial.render!(context)
-            end
-            content = parse_convertible(content, context)
-          end
-          content
-        end
+      @file = get_path(context)
+      if @tag == 'include' && @file && Cache.exists(Path.expand(File.join(INCLUDES_DIR, @file), context))
+        include_tag(context)
+      elsif @tag =~ /render/ && @file && Cache.exists(@file)
+        render_tag(context)
+      elsif @file
+        not_found(context)
       end
     end
 
-    def validate_file(file, safe)
-      if !File.exists?(file)
-        dir = File.join INCLUDES_DIR, File.dirname(file)
-        raise IOError.new "From #{@tag} tag on #{@page}: File '#{file}' not found in '#{dir}/'"
-      elsif File.symlink?(file) && safe
-        raise IOError.new "The included file '#{INCLUDES_DIR}/#{@file}' should not be a symlink"
+    def include_tag(context)
+      @markup = @file
+      @markup += @params if @params
+      @page = context.registers[:page]['path']
+      content = default_render(context)
+      parse_convertible(content, context)
+    end
+
+    def render_tag(context)
+      @markup = @file
+      @markup += @params if @params
+      content = read_raw
+
+      unless @raw
+        partial = Liquid::Template.parse(content)
+
+        content = context.stack do
+          context['render'] = Jekyll::Tags::IncludeTag.new('include', @markup, []).parse_params(context) if @params
+          context['page'] = context['page'].deep_merge(@local_vars) if @local_vars and @local_vars.keys.size > 0
+          partial.render!(context)
+        end
+        content = parse_convertible(content, context)
       end
+      content
+    end
+
+    def not_found(context)
+      @file = File.join(INCLUDES_DIR, @file) if @tag == 'include'
+      name = File.basename(@file)
+      dir  = @file.to_s.sub(context.registers[:site].source + '/', '').sub(name, '')
+      msg = "File '#{name}' not found"
+      msg +=  " in '#{dir}'" if dir.length > 0 && name != dir
+      raise IOError.new msg
     end
 
     def parse_convertible(content, context)
@@ -95,9 +103,10 @@ module LiquidPlus
       end
     end
 
-    def get_path(context, root=nil)
+    def get_path(context)
+      root = (@tag == 'include') ? INCLUDES_DIR : nil
       if file = Path.parse(@markup, context, root)
-        file = Path.expand(file, context) if @tag == 'render'
+        file = Path.expand(file, context) if @tag =~ /render/
         @markup = file
         file
       end
