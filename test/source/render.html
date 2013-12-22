@@ -27,7 +27,6 @@ file.html → {% render (some_bool ? f/file.html : f/file2.html) %}
 ## Cascading include
 file.html → {% render not_there.html || f/file.html %}
 '' → '{% render not_there.html or none %}'
-From render.html: File 'not_there.html' not found → {% render nothing || not_there.html %}
 
 ## Complex includes
 file2.html and variable → {% render (some_bool ? not_here : f/file.html) || f/file2.html var='variable' %}
@@ -39,3 +38,4 @@ file2.html and variable → {% render (some_bool ? not_here : f/file.html) || f/
 
 ## Render raw
 {% raw %}**{{ page.test_var }}{{ render.foo }}**{% endraw %} → {% render raw f/file3.md %}
+

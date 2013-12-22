@@ -3,32 +3,11 @@ require File.join File.expand_path('../../', __FILE__), 'helpers/path'
 module LiquidPlus
   class Include
     LOCALS = /(.*?)(([\w-]+)\s*=\s*(?:"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'|([\w\.-]+)))(.*)?/
-
     class << self
 
       def render(markup, context)
-
-        markup, params = split_params markup
-        file = Path.parse(markup, context, '_includes')
-
-        if file
-          if Cache.exists Path.expand(File.join('_includes', file), context)
-            markup = file
-            markup += params if params
-            tag = Jekyll::Tags::IncludeTag.new('', markup, [])
-            result = tag.render(context)
-          else
-            dir = '_includes'
-            dir = File.join dir, File.dirname(file) unless File.dirname(file) == '.'
-
-            msg  = "From #{context.registers[:page]['path']}: "
-            msg += "File '#{file}' not found"
-            msg += " in '#{dir}/' directory"
-
-            puts msg.red
-            return msg
-          end
-        end
+        tag = IncludeTag.new('include', markup, [])
+        tag.render(context)
       end
 
       def split_params(markup)
