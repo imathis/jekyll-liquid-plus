@@ -1,5 +1,4 @@
 require File.join File.expand_path('../../', __FILE__), 'helpers/include'
-require File.join File.expand_path('../../', __FILE__), 'tags/render'
 
 module LiquidPlus
   class WrapTag < Liquid::Block
@@ -17,7 +16,8 @@ module LiquidPlus
         back = $3
 
         partial = if @tag == 'wrap'
-          RenderTag.new('', @markup, []).render(context)
+          tag = IncludeTag.new('render', @markup, [])
+          tag.render(context)
         elsif @tag == 'wrap_include'
           Include.render(@markup, context)
         end
